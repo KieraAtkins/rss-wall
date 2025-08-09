@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Geist, Geist_Mono, Montserrat } from "next/font/google";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -10,6 +10,13 @@ const geistSans = Geist({
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
+});
+
+const montserrat = Montserrat({
+  variable: "--font-brand",
+  subsets: ["latin"],
+  weight: ["300", "400", "500", "600", "700"],
+  display: "swap",
 });
 
 export const metadata: Metadata = {
@@ -24,10 +31,31 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
-        {children}
+      <body className={`${montserrat.variable} ${geistSans.variable} ${geistMono.variable} bg-brand-bg text-brand-text`}>
+        <header className="border-b border-brand-border bg-brand-header">
+          <div className="mx-auto max-w-6xl px-4 py-4 flex items-center justify-between">
+            <a href="https://www.swacdc.org/" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-3">
+              <div className="h-2.5 w-2.5 rounded-full bg-brand-accent shadow-[0_0_0_4px_rgba(220,38,38,0.15)]" aria-hidden />
+              <span className="text-lg font-semibold tracking-wide">SWAC DC</span>
+            </a>
+            <nav className="hidden sm:flex items-center gap-6 text-sm text-brand-muted">
+              <a className="hover:text-brand-accent" href="/">Home</a>
+              <a className="hover:text-brand-accent" href="https://www.swacdc.org/about" target="_blank" rel="noopener noreferrer">About</a>
+              <a className="hover:text-brand-accent" href="https://www.swacdc.org/contact" target="_blank" rel="noopener noreferrer">Contact</a>
+            </nav>
+          </div>
+        </header>
+
+        <main className="min-h-[calc(100dvh-140px)]">{children}</main>
+
+        <footer className="mt-10 border-t border-brand-border bg-brand-header">
+          <div className="mx-auto max-w-6xl px-4 py-6 text-sm text-brand-muted flex flex-col sm:flex-row items-center justify-between gap-2">
+            <p>&copy; {new Date().getFullYear()} Sex Workers Advocacy Coalition DC</p>
+            <p>
+              <a className="text-brand-link hover:underline" href="https://www.swacdc.org/" target="_blank" rel="noopener noreferrer">swacdc.org</a>
+            </p>
+          </div>
+        </footer>
       </body>
     </html>
   );

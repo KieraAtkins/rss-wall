@@ -1,8 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
+export const runtime = "nodejs"; // ensure Node.js runtime for rss-parser
+export const dynamic = "force-dynamic"; // no static caching
 import Parser from "rss-parser";
 import { feeds } from "@/feeds";
 
 const parser = new Parser();
+
+// Force Node.js runtime for compatibility with rss-parser
 
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
@@ -13,19 +17,20 @@ export async function GET(req: NextRequest) {
   let allItems: any[] = [];
 
   for (const feed of feeds) {
-    if (source && feed.name !== source) continue; // filter by feed name
-
-    try {
-      const parsed = await parser.parseURL(feed.url);
-      const items = parsed.items.map(item => ({
-        ...item,
-        source: feed.name,
-      }));
-      allItems.push(...items);
-    } catch (err) {
-      console.error(`Failed to parse feed: ${feed.url}`, err);
+  try {
+    const parsed = await parser.parseURL(feed.url);
+    let items = parsed.items.map(item => ({
+      ...item,
+      source: feed.name,
+    }));
+    if (feed.limit) {
+      items = items.slice(0, feed.limit);
     }
+    allItems.push(...items);
+  } catch (err) {
+    console.error(`Failed to parse feed: ${feed.url}`, err);
   }
+}
 
   allItems.sort((a, b) => new Date(b.pubDate || b.isoDate).getTime() - new Date(a.pubDate || a.isoDate).getTime());
 

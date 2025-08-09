@@ -1,26 +1,54 @@
 @import "tailwindcss";
 
+/* Brand tokens for SWACDC */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* colors */
+  /* SWACDC dark palette (approx) */
+  --color-brand-bg: #0f0f10;         /* app background (near-black) */
+  --color-brand-header: #111113;     /* header/footer */
+  --color-brand-card: #17181a;       /* cards/surfaces */
+  --color-brand-text: #e5e7eb;       /* primary text */
+  --color-brand-muted: #9ca3af;      /* secondary text */
+  --color-brand-border: #2a2d31;     /* subtle borders */
+  --color-brand-accent: #dc2626;     /* red accent */
+  --color-brand-accent-dark: #b91c1c;
+  --color-brand-accent-soft: #3b0b0b; /* soft red bg for chips */
+  --color-brand-link: #fca5a5;       /* light red for links */
+  --color-black: #000000;
+  --color-white: #ffffff;
+
+  /* fonts: provided via Next/font variable --font-brand */
+
+  /* radius & shadow tokens */
+  --radius-brand: 12px;
+  --shadow-brand: 0 6px 24px rgba(0,0,0,0.08);
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+/* Base app look */
+html, body {
+  background-color: var(--color-brand-bg);
+  color: var(--color-brand-text);
+  font-family: var(--font-brand), system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
+/* Utilities for custom tokens */
+.rounded-brand { border-radius: var(--radius-brand); }
+.shadow-brand { box-shadow: var(--shadow-brand); }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
-}
+/* Tailwind-like brand color utilities backed by CSS vars */
+.bg-brand-bg { background-color: var(--color-brand-bg); }
+.bg-brand-header { background-color: var(--color-brand-header); }
+.bg-brand-card { background-color: var(--color-brand-card); }
+.bg-brand-accent { background-color: var(--color-brand-accent); }
+.text-brand-text { color: var(--color-brand-text); }
+.text-brand-muted { color: var(--color-brand-muted); }
+.text-brand-link { color: var(--color-brand-link); }
+.border-brand-border { border-color: var(--color-brand-border); }
+
+/* Pseudo variants for hover utilities */
+.hover\:text-brand-accent:hover { color: var(--color-brand-accent); }
+.hover\:bg-brand-accent:hover { background-color: var(--color-brand-accent); }
+
+/* Basic link styles */
+a { color: var(--color-brand-link); text-decoration: none; }
+a:hover { text-decoration: underline; }

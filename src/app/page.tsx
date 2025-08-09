@@ -13,7 +13,7 @@ type NewsItem = {
 
 async function getNews() {
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000";
-  const res = await fetch(`${baseUrl}/api/rss?limit=20`, { cache: "no-store" });
+  const res = await fetch(`${baseUrl}/api/rss`, { cache: "no-store" });
   return res.json();
 }
 
@@ -21,9 +21,9 @@ export default async function Home() {
   const news: NewsItem[] = await getNews();
 
   return (
-    <main className="min-h-screen bg-black p-6">
-     
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+    <section className="mx-auto max-w-6xl px-4 py-8">
+      <h1 className="mb-6 text-3xl font-semibold tracking-wide">Latest Updates</h1>
+      <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
         {news.map((item, idx) => (
           <NewsCard
             key={idx}
@@ -40,6 +40,6 @@ export default async function Home() {
           />
         ))}
       </div>
-    </main>
+  </section>
   );
 }
