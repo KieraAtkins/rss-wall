@@ -8,19 +8,34 @@ const parser = new Parser();
 
 // Force Node.js runtime for compatibility with rss-parser
 
+// Minimal item types we care about from RSS feeds
+type ParsedItem = {
+  title?: string;
+  link?: string;
+  pubDate?: string;
+  isoDate?: string;
+  contentSnippet?: string;
+  enclosure?: { url?: string };
+  media?: { content?: { url?: string } };
+  [key: string]: unknown;
+};
+
+type NewsItem = ParsedItem & { source: string };
+
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
 
   const source = searchParams.get("source"); // e.g., "Truthout"
-  const limit = searchParams.get("limit");   // e.g., "10"
+  const limit = searchParams.get("limit"); // e.g., "10"
 
-  let allItems: any[] = [];
+  const allItems: NewsItem[] = [];
 
   for (const feed of feeds) {
+  if (source && feed.name !== source) continue;
   try {
     const parsed = await parser.parseURL(feed.url);
-    let items = parsed.items.map(item => ({
-      ...item,
+    let items: NewsItem[] = (parsed.items as ParsedItem[]).map((item) => ({
+      ...(item as ParsedItem),
       source: feed.name,
     }));
     if (feed.limit) {
@@ -32,10 +47,17 @@ export async function GET(req: NextRequest) {
   }
 }
 
-  allItems.sort((a, b) => new Date(b.pubDate || b.isoDate).getTime() - new Date(a.pubDate || a.isoDate).getTime());
+  const toTime = (i: NewsItem) => {
+    const raw = (i.pubDate ?? i.isoDate) as string | undefined;
+    return raw ? new Date(raw).getTime() : 0;
+  };
+  allItems.sort((a, b) => toTime(b) - toTime(a));
 
   if (limit) {
-    allItems = allItems.slice(0, parseInt(limit));
+    const n = Number.parseInt(limit, 10);
+    if (!Number.isNaN(n)) {
+      return NextResponse.json(allItems.slice(0, n));
+    }
   }
 
   return NextResponse.json(allItems);

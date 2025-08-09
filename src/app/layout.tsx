@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { Geist, Geist_Mono, Montserrat } from "next/font/google";
 import "./globals.css";
 
@@ -39,7 +40,7 @@ export default function RootLayout({
               <span className="text-lg font-semibold tracking-wide">SWAC DC</span>
             </a>
             <nav className="hidden sm:flex items-center gap-6 text-sm text-brand-muted">
-              <a className="hover:text-brand-accent" href="/">Home</a>
+              <Link className="hover:text-brand-accent" href="/">Home</Link>
               <a className="hover:text-brand-accent" href="https://www.swacdc.org/about" target="_blank" rel="noopener noreferrer">About</a>
               <a className="hover:text-brand-accent" href="https://www.swacdc.org/contact" target="_blank" rel="noopener noreferrer">Contact</a>
             </nav>
