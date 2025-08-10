@@ -34,10 +34,10 @@ export default function Header() {
           <nav className="site-nav show-above-800 ml-[42px] text-sm">
             <ul className="flex items-center gap-8">
               <li><Link href="https://www.swacdc.org">Home</Link></li>
-              <li><a href="https://www.swacdc.org/history" target="_blank" rel="noopener noreferrer">About</a></li>
-              <li><a href="https://www.swacdc.org/s/stories" target="_blank" rel="noopener noreferrer">Stories</a></li>
-              <li><a href="/" target="_blank" rel="noopener noreferrer">News</a></li>
-              <li><a href="https://www.swacdc.org/gallery" target="_blank" rel="noopener noreferrer">Gallery</a></li>
+              <li><a href="https://www.swacdc.org/history">About</a></li>
+              <li><a href="https://www.swacdc.org/s/stories">Stories</a></li>
+              <li><Link href="/">News</Link></li>
+              <li><a href="https://www.swacdc.org/gallery">Gallery</a></li>
             </ul>
           </nav>
         </div>
@@ -69,27 +69,27 @@ export default function Header() {
   <nav className="site-nav absolute left-0 top-0 h-full w-72 max-w-[80vw] bg-brand-header border-r border-brand-border shadow-brand p-4 text-sm">
           <ul className="flex flex-col divide-y divide-white/10">
             <li>
-              <a href="https://www.swacdc.org" target="_blank" rel="noopener noreferrer" className="block px-2 py-3 text-white" onClick={() => setOpen(false)}>
+              <a href="https://www.swacdc.org" className="block px-2 py-3 text-white" onClick={() => setOpen(false)}>
                 Home
               </a>
             </li>
             <li>
-              <a href="https://www.swacdc.org/history" target="_blank" rel="noopener noreferrer" className="block px-2 py-3 text-white" onClick={() => setOpen(false)}>
+              <a href="https://www.swacdc.org/history" className="block px-2 py-3 text-white" onClick={() => setOpen(false)}>
                 About
               </a>
             </li>
             <li>
-              <a href="https://www.swacdc.org/s/stories" target="_blank" rel="noopener noreferrer" className="block px-2 py-3 text-white" onClick={() => setOpen(false)}>
+              <a href="https://www.swacdc.org/s/stories" className="block px-2 py-3 text-white" onClick={() => setOpen(false)}>
                 Stories
               </a>
             </li>
             <li>
-              <Link href="/" target="_blank" rel="noopener noreferrer" className="block px-2 py-3 text-white" onClick={() => setOpen(false)}>
+              <Link href="/" className="block px-2 py-3 text-white" onClick={() => setOpen(false)}>
                 News
               </Link>
             </li>
             <li>
-              <a href="https://www.swacdc.org/gallery" target="_blank" rel="noopener noreferrer" className="block px-2 py-3 text-white" onClick={() => setOpen(false)}>
+              <a href="https://www.swacdc.org/gallery" className="block px-2 py-3 text-white" onClick={() => setOpen(false)}>
                 Gallery
               </a>
             </li>

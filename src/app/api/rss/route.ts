@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 export const runtime = "nodejs"; // ensure Node.js runtime for rss-parser
 export const dynamic = "force-dynamic"; // no static caching
 import Parser from "rss-parser";
-import { feeds } from "@/feeds";
+import { feeds, FeedConfig } from "@/feeds";
 
 const parser = new Parser();
 
@@ -30,14 +30,28 @@ export async function GET(req: NextRequest) {
 
   const allItems: NewsItem[] = [];
 
-  for (const feed of feeds) {
+  for (const feed of feeds as FeedConfig[]) {
   if (source && feed.name !== source) continue;
   try {
     const parsed = await parser.parseURL(feed.url);
-    let items: NewsItem[] = (parsed.items as ParsedItem[]).map((item) => ({
+      let items: NewsItem[] = (parsed.items as ParsedItem[]).map((item) => ({
       ...(item as ParsedItem),
       source: feed.name,
     }));
+      // Per-feed keyword filtering (semicolon-separated, case-insensitive)
+      if (feed.keywords && feed.keywords.trim().length > 0) {
+        const terms = feed.keywords
+          .split(";")
+          .map((t) => t.trim())
+          .filter(Boolean)
+          .map((t) => t.toLowerCase());
+        if (terms.length > 0) {
+          items = items.filter((it) => {
+            const hay = `${it.title ?? ""} ${it.contentSnippet ?? ""}`.toLowerCase();
+            return terms.some((term) => hay.includes(term));
+          });
+        }
+      }
     if (feed.limit) {
       items = items.slice(0, feed.limit);
     }

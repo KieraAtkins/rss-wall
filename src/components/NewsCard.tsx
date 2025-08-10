@@ -20,7 +20,7 @@ export default function NewsCard({ title, link, pubDate, contentSnippet, source,
       <div className="h-44 w-full bg-brand-header" />
       )}
       <div className="p-4 flex flex-col gap-2">
-  <a href={link} target="_blank" rel="noopener noreferrer"
+  <a href={link}
   className="font-logo text-[15px] font-semibold leading-snug text-brand-text hover:text-brand-accent">
           {title}
         </a>
@@ -28,7 +28,7 @@ export default function NewsCard({ title, link, pubDate, contentSnippet, source,
           {source} • {new Date(pubDate).toLocaleDateString()}
         </div>
       {contentSnippet && <p className="text-sm text-brand-muted line-clamp-3">{contentSnippet}</p>}
-        <a href={link} target="_blank" rel="noopener noreferrer"
+  <a href={link}
         className="mt-1 inline-flex items-center gap-2 text-sm font-medium text-brand-link hover:underline">
        Read more →
         </a>
