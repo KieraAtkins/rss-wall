@@ -20,8 +20,8 @@ export default function NewsCard({ title, link, pubDate, contentSnippet, source,
       <div className="h-44 w-full bg-brand-header" />
       )}
       <div className="p-4 flex flex-col gap-2">
-        <a href={link} target="_blank" rel="noopener noreferrer"
-        className="text-[15px] font-semibold leading-snug text-brand-text hover:text-brand-accent">
+  <a href={link} target="_blank" rel="noopener noreferrer"
+  className="font-logo text-[15px] font-semibold leading-snug text-brand-text hover:text-brand-accent">
           {title}
         </a>
         <div className="text-xs text-brand-muted">

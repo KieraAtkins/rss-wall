@@ -13,7 +13,7 @@
   --color-brand-accent: #dc2626;     /* red accent */
   --color-brand-accent-dark: #b91c1c;
   --color-brand-accent-soft: #3b0b0b; /* soft red bg for chips */
-  --color-brand-link: #fca5a5;       /* light red for links */
+  --color-brand-link: #d72303;       /* light red for links */
   --color-black: #000000;
   --color-white: #ffffff;
 
@@ -45,6 +45,9 @@ html, body {
 .text-brand-link { color: var(--color-brand-link); }
 .border-brand-border { border-color: var(--color-brand-border); }
 
+/* Logo font helper */
+.font-logo { font-family: var(--font-logo), var(--font-brand), system-ui, sans-serif; }
+
 /* Pseudo variants for hover utilities */
 .hover\:text-brand-accent:hover { color: var(--color-brand-accent); }
 .hover\:bg-brand-accent:hover { background-color: var(--color-brand-accent); }
@@ -52,3 +55,21 @@ html, body {
 /* Basic link styles */
 a { color: var(--color-brand-link); text-decoration: none; }
 a:hover { text-decoration: underline; }
+
+/* Header nav overrides: white links, underline on hover (white, thicker, offset) */
+header .site-nav a { color: var(--color-white); text-decoration: none; }
+header .site-nav a:hover {
+  color: var(--color-white);
+  text-decoration-line: underline;
+  text-decoration-color: var(--color-white);
+  text-decoration-thickness: 2px;
+  text-underline-offset: 4px;
+}
+
+/* Custom responsive helpers (breakpoint: 960px) */
+.show-above-800 { display: none; }
+.hide-above-800 { display: inline-flex; }
+@media (min-width: 960px) {
+  .show-above-800 { display: flex !important; }
+  .hide-above-800 { display: none !important; }
+}
