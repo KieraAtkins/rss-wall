@@ -31,7 +31,7 @@ export default function Header() {
           </button>
 
           {/* Inline nav (≥800px) */}
-          <nav className="site-nav show-above-800 ml-[42px] text-sm">
+          <nav className="site-nav show-above-800 nav-offset text-sm">
             <ul className="flex items-center gap-8">
               <li><Link href="https://www.swacdc.org">Home</Link></li>
               <li><a href="https://www.swacdc.org/history">About</a></li>

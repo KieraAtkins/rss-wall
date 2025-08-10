@@ -12,7 +12,7 @@ type NewsCardProps = {
 
 export default function NewsCard({ title, link, pubDate, contentSnippet, source, image }: NewsCardProps) {
   return (
-  <article className="group overflow-hidden rounded-brand border border-brand-border bg-brand-card shadow-brand flex flex-col transition-transform duration-200 hover:-translate-y-0.5">
+  <article className="group overflow-hidden rounded-brand border border-brand-border bg-brand-card shadow-brand flex flex-col transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0_10px_30px_rgba(220,38,38,0.35)]">
       {image ? (
         // eslint-disable-next-line @next/next/no-img-element
       <img src={image} alt="" className="h-44 w-full object-cover" />

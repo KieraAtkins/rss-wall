@@ -4,8 +4,8 @@
 :root {
   /* colors */
   /* SWACDC dark palette (approx) */
-  --color-brand-bg: #0f0f10;         /* app background (near-black) */
-  --color-brand-header: #111113;     /* header/footer */
+  --color-brand-bg: #111111;         /* app background (near-black) */
+  --color-brand-header: #111111;     /* header/footer */
   --color-brand-card: #17181a;       /* cards/surfaces */
   --color-brand-text: #e5e7eb;       /* primary text */
   --color-brand-muted: #9ca3af;      /* secondary text */
@@ -16,6 +16,9 @@
   --color-brand-link: #d72303;       /* light red for links */
   --color-black: #000000;
   --color-white: #ffffff;
+
+  /* layout */
+  --nav-offset: 42px; /* keep header and page aligned; tweak as needed */
 
   /* fonts: provided via Next/font variable --font-brand */
 
@@ -66,10 +69,26 @@ header .site-nav a:hover {
   text-underline-offset: 4px;
 }
 
+/* Footer nav overrides: white links with white underline on hover */
+footer a { color: var(--color-white); }
+footer a:hover { color: var(--color-white); }
+footer .site-nav a { color: var(--color-white); text-decoration: none; }
+footer .site-nav a:hover {
+  color: var(--color-white);
+  text-decoration-line: underline;
+  text-decoration-color: var(--color-white);
+  text-decoration-thickness: 2px;
+  text-underline-offset: 4px;
+}
+
 /* Custom responsive helpers (breakpoint: 960px) */
 .show-above-800 { display: none; }
 .hide-above-800 { display: inline-flex; }
 @media (min-width: 960px) {
   .show-above-800 { display: flex !important; }
   .hide-above-800 { display: none !important; }
+
+  /* Desktop-only alignment to match header nav left offset */
+  .align-with-nav { padding-left: var(--nav-offset); }
+  .nav-offset { margin-left: var(--nav-offset); }
 }

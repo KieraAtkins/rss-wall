@@ -46,12 +46,25 @@ export default function RootLayout({
 
         <main className="min-h-[calc(100dvh-140px)]">{children}</main>
 
-        <footer className="mt-10 border-t border-brand-border bg-brand-header">
-          <div className="mx-auto max-w-6xl px-4 py-6 text-sm text-brand-muted flex flex-col sm:flex-row items-center justify-between gap-2">
-            <p>&copy; {new Date().getFullYear()} Sex Workers Advocacy Coalition DC</p>
-            <p>
-              <a className="text-brand-link hover:underline" href="https://www.swacdc.org/">swacdc.org</a>
-            </p>
+        <footer className="mt-16 bg-brand-header">
+          <div className="mx-auto max-w-6xl px-4 py-10">
+            <div className="align-with-nav">
+              <div className="flex items-center">
+                <Link href="https://www.swacdc.org" className="font-logo text-white text-xl select-none">SWAC DC</Link>
+              </div>
+
+              <nav className="site-nav mt-6">
+                <ul className="flex flex-wrap items-center gap-8 text-sm">
+                  <li><Link href="https://www.swacdc.org">Home</Link></li>
+                  <li><a href="https://www.swacdc.org/history">About</a></li>
+                  <li><a href="https://www.swacdc.org/s/stories">Stories</a></li>
+                  <li><Link href="/">News</Link></li>
+                  <li><a href="https://www.swacdc.org/gallery">Gallery</a></li>
+                </ul>
+              </nav>
+
+              <div className="mt-10 h-px w-full border-t border-white/15" />
+            </div>
           </div>
         </footer>
       </body>

@@ -31,8 +31,9 @@ export default async function Home() {
   const news: NewsItem[] = await getNews();
 
   return (
-    <section className="mx-auto max-w-6xl px-4 py-8">
-  <h1 className="font-logo mb-6 text-3xl font-semibold tracking-wide">Latest News</h1>
+  <section className="mx-auto max-w-6xl px-4 py-8">
+    <div className="align-with-nav">
+      <h1 className="font-logo mb-6 text-3xl font-semibold tracking-wide">Latest News</h1>
       <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
         {news.map((item, idx) => (
           <NewsCard
@@ -50,6 +51,7 @@ export default async function Home() {
           />
         ))}
       </div>
+    </div>
   </section>
   );
 }
