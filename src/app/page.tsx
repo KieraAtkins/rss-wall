@@ -1,5 +1,6 @@
 // src/app/page.tsx
 import NewsCard from "@/components/NewsCard";
+import { headers } from "next/headers";
 
 type NewsItem = {
   title: string;
@@ -12,9 +13,18 @@ type NewsItem = {
 };
 
 async function getNews() {
-  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000";
-  const res = await fetch(`${baseUrl}/api/rss`, { cache: "no-store" });
-  return res.json();
+  try {
+    const h = await headers();
+    const proto = h.get("x-forwarded-proto") ?? "http";
+    const host = h.get("host") ?? "localhost:3000";
+    const baseUrl = `${proto}://${host}`;
+    const res = await fetch(`${baseUrl}/api/rss`, { cache: "no-store" });
+    if (!res.ok) throw new Error(`Failed to load RSS: ${res.status}`);
+    return res.json();
+  } catch (err) {
+    console.error("Failed to fetch /api/rss", err);
+    return [] as NewsItem[];
+  }
 }
 
 export default async function Home() {
