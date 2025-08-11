@@ -37,15 +37,16 @@ export default async function Home() {
       <h1 className="font-logo mb-6 text-3xl font-semibold tracking-wide">Latest News</h1>
       <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
         {news.map((item, idx) => (
-          <NewsCard
-            key={idx}
-            title={item.title}
-            link={item.link}
-            pubDate={item.pubDate}
-            contentSnippet={item.contentSnippet || ""}
-            source={item.source}
-            image={item.image || item.enclosure?.url || item.media?.content?.url}
-          />
+          <div key={idx} className="card-fade-in" style={{ animationDelay: `${Math.min(idx * 90, 700)}ms` }}>
+            <NewsCard
+              title={item.title}
+              link={item.link}
+              pubDate={item.pubDate}
+              contentSnippet={item.contentSnippet || ""}
+              source={item.source}
+              image={item.image || item.enclosure?.url || item.media?.content?.url}
+            />
+          </div>
         ))}
       </div>
     </div>

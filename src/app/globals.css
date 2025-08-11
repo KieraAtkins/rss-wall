@@ -163,6 +163,18 @@ h1.admin-title a:hover {
   text-decoration: underline;
 }
 
+/* Enhanced fade-in for cards */
+@keyframes cardFadeIn {
+  from { opacity: 0; transform: translateY(14px) scale(0.98); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+.card-fade-in { opacity: 0; animation: cardFadeIn 650ms cubic-bezier(0.2, 0.7, 0.2, 1) forwards; }
+
+/* Respect reduced motion preferences */
+@media (prefers-reduced-motion: reduce) {
+  .card-fade-in { animation-duration: 150ms; transform: none; }
+}
+
 /* Custom responsive helpers (breakpoint: 960px) */
 .show-above-800 { display: none; }
 .hide-above-800 { display: inline-flex; }
