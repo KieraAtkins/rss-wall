@@ -8,7 +8,8 @@ type NewsItem = {
   pubDate: string;
   contentSnippet?: string;
   source: string;
-  enclosure?: { url: string };
+  image?: string;
+  enclosure?: { url?: string };
   media?: { content?: { url?: string } };
 };
 
@@ -18,7 +19,7 @@ async function getNews() {
     const proto = h.get("x-forwarded-proto") ?? "http";
     const host = h.get("host") ?? "localhost:3000";
     const baseUrl = `${proto}://${host}`;
-    const res = await fetch(`${baseUrl}/api/rss`, { cache: "no-store" });
+  const res = await fetch(`${baseUrl}/api/rss`, { cache: "no-store" });
     if (!res.ok) throw new Error(`Failed to load RSS: ${res.status}`);
     return res.json();
   } catch (err) {
@@ -43,11 +44,7 @@ export default async function Home() {
             pubDate={item.pubDate}
             contentSnippet={item.contentSnippet || ""}
             source={item.source}
-            image={
-              item.enclosure?.url ||
-              item.media?.content?.url ||
-              undefined
-            }
+            image={item.image || item.enclosure?.url || item.media?.content?.url}
           />
         ))}
       </div>

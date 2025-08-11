@@ -3,6 +3,7 @@ export const runtime = "nodejs"; // ensure Node.js runtime for rss-parser
 export const dynamic = "force-dynamic"; // no static caching
 import Parser from "rss-parser";
 import { sql } from "@/lib/db";
+import { extractImageFromUrl } from "@/lib/extractImage";
 
 const parser = new Parser();
 
@@ -15,12 +16,14 @@ type ParsedItem = {
   pubDate?: string;
   isoDate?: string;
   contentSnippet?: string;
+  content?: string; // html
+  "content:encoded"?: string; // html
   enclosure?: { url?: string };
   media?: { content?: { url?: string } };
   [key: string]: unknown;
 };
 
-type NewsItem = ParsedItem & { source: string };
+type NewsItem = ParsedItem & { source: string; image?: string };
 
 type DBFeedRow = {
   id: number;
@@ -57,6 +60,8 @@ export async function GET(req: NextRequest) {
 
   const source = searchParams.get("source"); // e.g., "Truthout"
   const limit = searchParams.get("limit"); // e.g., "10"
+  const useOg = searchParams.get("og") === "1"; // optional heavier fallback
+  const ogBudgetParam = searchParams.get("ogBudget");
 
   const allItems: NewsItem[] = [];
 
@@ -68,14 +73,63 @@ export async function GET(req: NextRequest) {
       feedList.map((f) => ({ name: f.name, url: f.url }))
     );
   } catch {}
+  // helpers
+  const extractFromHtml = (html: string | undefined): string | undefined => {
+    if (!html) return undefined;
+    // Try common patterns: img src, data-src, data-original
+    const imgRe = /<img[^>]+(?:src|data-src|data-original)=["']([^"']+)["'][^>]*>/i;
+    const m = imgRe.exec(html);
+    if (m && /^https?:\/\//i.test(m[1])) return m[1];
+    // Fallback: srcset first URL
+    const srcsetRe = /<img[^>]+srcset=["']([^"']+)["'][^>]*>/i;
+    const ms = srcsetRe.exec(html);
+    if (ms) {
+      const first = ms[1].split(",")[0]?.trim().split(" ")[0];
+      if (first && /^https?:\/\//i.test(first)) return first;
+    }
+    return undefined;
+  };
+
+  const extractImage = (item: ParsedItem): string | undefined => {
+    const enc = item.enclosure?.url as string | undefined;
+    if (enc) return enc;
+    const anyItem = item as unknown as Record<string, any>;
+    // Some feeds expose 'enclosures' array
+    if (Array.isArray(anyItem.enclosures) && anyItem.enclosures[0]?.url) {
+      const u = anyItem.enclosures[0].url as string;
+      if (u) return u;
+    }
+    const mediaUrl = item.media?.content?.url as string | undefined;
+    if (mediaUrl) return mediaUrl;
+    // Handle 'media:content' with attribute bag
+    const mcontent = anyItem["media:content"]; // could be object or array
+    if (mcontent) {
+      const mc = Array.isArray(mcontent) ? mcontent[0] : mcontent;
+      const url = mc?.$?.url || mc?.url;
+      if (typeof url === "string") return url;
+    }
+    // Some feeds provide 'image' or 'thumbnail'
+    if (typeof anyItem.image === "string") return anyItem.image;
+    if (typeof anyItem.thumbnail === "string") return anyItem.thumbnail;
+    const fromContent = extractFromHtml((item["content:encoded"] as string | undefined) ?? item.content);
+    if (fromContent) return fromContent;
+    return undefined;
+  };
+
+  let ogBudget = 5; // guard extra fetches per request
+  if (ogBudgetParam) {
+    const n = Number.parseInt(ogBudgetParam, 10);
+    if (!Number.isNaN(n) && n >= 0) ogBudget = n;
+  }
+
   for (const feed of feedList) {
   if (source && feed.name !== source) continue;
   try {
     const parsed = await parser.parseURL(feed.url);
-      let items: NewsItem[] = (parsed.items as ParsedItem[]).map((item) => ({
-      ...(item as ParsedItem),
-      source: feed.name,
-    }));
+      let items: NewsItem[] = (parsed.items as ParsedItem[]).map((item) => {
+        const image = extractImage(item);
+        return { ...(item as ParsedItem), source: feed.name, image } as NewsItem;
+      });
       // Per-feed keyword filtering (semicolon-separated, case-insensitive)
       if (feed.keywords && feed.keywords.trim().length > 0) {
         const terms = feed.keywords
@@ -92,6 +146,21 @@ export async function GET(req: NextRequest) {
       }
     if (feed.limit) {
       items = items.slice(0, feed.limit);
+    }
+    // Optional heavier fallback: fetch article page for og:image when missing
+    if (useOg && ogBudget > 0) {
+      for (const it of items) {
+        if (ogBudget <= 0) break;
+        if (!it.image && it.link) {
+          try {
+            const result = await extractImageFromUrl(it.link, 6000);
+            if (result.url) {
+              it.image = result.url;
+              ogBudget--;
+            }
+          } catch {}
+        }
+      }
     }
     allItems.push(...items);
   } catch (err) {
