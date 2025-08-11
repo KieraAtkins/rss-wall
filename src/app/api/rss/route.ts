@@ -4,6 +4,7 @@ export const dynamic = "force-dynamic"; // no static caching
 import Parser from "rss-parser";
 import { sql } from "@/lib/db";
 import { extractImageFromUrl } from "@/lib/extractImage";
+import { imageCache } from "@/lib/cache";
 
 const parser = new Parser();
 
@@ -159,10 +160,17 @@ export async function GET(req: NextRequest) {
         if (ogBudget <= 0) break;
         if (!it.image && it.link) {
           try {
-            const result = await extractImageFromUrl(it.link, 6000);
-            if (result.url) {
-              it.image = result.url;
+            const cached = imageCache.get(it.link);
+            if (cached?.url) {
+              it.image = cached.url;
               ogBudget--;
+            } else {
+              const result = await extractImageFromUrl(it.link, 6000);
+              if (result.url) {
+                it.image = result.url;
+                imageCache.set(it.link, { url: result.url, kind: result.kind }, 1000 * 60 * 30);
+                ogBudget--;
+              }
             }
           } catch {}
         }
