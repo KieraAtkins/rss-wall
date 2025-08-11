@@ -8,14 +8,15 @@ import * as bcrypt from "bcryptjs";
 export async function updateProfile(formData: FormData) {
   const session = await auth();
   if (!session?.user) redirect("/admin?error=auth");
-  let id = (session.user as any).id as string | undefined;
+  const sessUser = session.user as { id?: string; username?: string | null; email?: string | null };
+  let id = sessUser.id;
   const db = sql;
   if (!db) redirect("/admin?error=db");
 
   // Fallback: resolve user id via username or email if not present on session
   if (!id) {
-    const username = (session.user as any).username as string | undefined;
-    const email = session.user.email ?? undefined;
+    const username = sessUser.username ?? undefined;
+    const email = sessUser.email ?? undefined;
     try {
       if (username) {
         const rows = await db<{ id: string }[]>`
@@ -29,8 +30,8 @@ export async function updateProfile(formData: FormData) {
         `;
         id = rows[0]?.id;
       }
-    } catch (e) {
-      console.error("Failed to resolve current user id", e);
+    } catch {
+      console.error("Failed to resolve current user id");
     }
   }
   if (!id) redirect("/admin?error=auth");

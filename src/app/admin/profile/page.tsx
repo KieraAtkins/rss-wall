@@ -13,7 +13,7 @@ export default async function ProfilePage() {
       </section>
     );
   }
-  const user: any = session.user;
+  const user = session.user as { name?: string | null; email?: string | null };
   return (
     <section className="mx-auto max-w-2xl px-4 py-12 align-with-nav">
       <h1 className="font-logo text-2xl mb-6">Your Profile</h1>

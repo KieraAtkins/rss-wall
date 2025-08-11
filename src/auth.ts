@@ -16,9 +16,10 @@ export const {
     async jwt({ token, user }) {
       // Persist id and username on the token at sign-in
       if (user) {
-        const u = user as unknown as { id?: string; username?: string | null };
-        if (u.id) (token as Record<string, unknown>).id = u.id;
-        if (u.username) (token as Record<string, unknown>).username = u.username;
+        const u = user as { id?: string; username?: string | null };
+        const t = token as Record<string, unknown>;
+        if (u.id) t.id = u.id;
+        if (u.username) t.username = u.username;
       }
       return token;
     },
@@ -27,7 +28,7 @@ export const {
       const t = token as Record<string, unknown>;
       const id = typeof t.id === "string" ? t.id : undefined;
       if (session.user && id) {
-        const s: any = session;
+        const s = session as unknown as { user: { id?: string; name?: string | null; email?: string | null; username?: string | null } };
         s.user.id = id;
         const db = sql;
         if (db) {
@@ -44,7 +45,7 @@ export const {
               s.user.email = row.email ?? null;
               s.user.username = row.username;
             }
-          } catch (e) {
+          } catch {
             // ignore - fallback to token/session values
           }
         }
@@ -97,8 +98,8 @@ export const {
             email: user.email ?? undefined,
             username: user.username,
           };
-        } catch (e) {
-          console.error("Auth query failed", e);
+        } catch {
+          console.error("Auth query failed");
           return null;
         }
       },

@@ -72,7 +72,7 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
       <div className="mb-6 flex items-center justify-between">
         <h1 className="font-logo text-2xl admin-title">
           <Link href="/admin/profile" className="text-white hover:underline">
-            {(session?.user as any)?.username ?? session?.user?.name ?? "Admin"}
+            {(session?.user as { username?: string | null; name?: string | null } | undefined)?.username ?? session?.user?.name ?? "Admin"}
           </Link>
         </h1>
         <div className="flex items-center gap-3">
