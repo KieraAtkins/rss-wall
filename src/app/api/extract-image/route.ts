@@ -21,7 +21,7 @@ export async function GET(req: NextRequest) {
   try {
     const result = await extractImageFromUrl(target, 8000);
     return NextResponse.json({ image: result.url ?? null, kind: result.kind ?? null, source: target });
-  } catch (e) {
+  } catch {
     return NextResponse.json({ error: "Failed to fetch or parse target" }, { status: 502 });
   }
 }

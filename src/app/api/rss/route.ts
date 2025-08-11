@@ -93,24 +93,30 @@ export async function GET(req: NextRequest) {
   const extractImage = (item: ParsedItem): string | undefined => {
     const enc = item.enclosure?.url as string | undefined;
     if (enc) return enc;
-    const anyItem = item as unknown as Record<string, any>;
+    const anyItem = item as unknown as Record<string, unknown>;
     // Some feeds expose 'enclosures' array
-    if (Array.isArray(anyItem.enclosures) && anyItem.enclosures[0]?.url) {
-      const u = anyItem.enclosures[0].url as string;
-      if (u) return u;
+    const enclosures = anyItem.enclosures as unknown;
+    if (Array.isArray(enclosures) && enclosures[0] && typeof enclosures[0] === "object") {
+      const first = enclosures[0] as { url?: unknown };
+      if (typeof first.url === "string" && first.url) return first.url;
     }
     const mediaUrl = item.media?.content?.url as string | undefined;
     if (mediaUrl) return mediaUrl;
     // Handle 'media:content' with attribute bag
-    const mcontent = anyItem["media:content"]; // could be object or array
+    const mcontent = (anyItem["media:content"] as unknown) ?? undefined; // could be object or array
     if (mcontent) {
       const mc = Array.isArray(mcontent) ? mcontent[0] : mcontent;
-      const url = mc?.$?.url || mc?.url;
-      if (typeof url === "string") return url;
+      if (mc && typeof mc === "object") {
+        const bag = (mc as { $?: { url?: unknown }; url?: unknown });
+        const url = (bag.$?.url as unknown) ?? bag.url;
+        if (typeof url === "string") return url;
+      }
     }
     // Some feeds provide 'image' or 'thumbnail'
-    if (typeof anyItem.image === "string") return anyItem.image;
-    if (typeof anyItem.thumbnail === "string") return anyItem.thumbnail;
+    const imgField = (anyItem.image as unknown);
+    if (typeof imgField === "string") return imgField;
+    const thumbField = (anyItem.thumbnail as unknown);
+    if (typeof thumbField === "string") return thumbField;
     const fromContent = extractFromHtml((item["content:encoded"] as string | undefined) ?? item.content);
     if (fromContent) return fromContent;
     return undefined;
