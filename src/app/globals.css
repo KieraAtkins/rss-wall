@@ -98,6 +98,25 @@ footer .site-nav a:hover {
   text-underline-offset: 4px;
 }
 
+/* Social buttons in footer */
+.social-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 9999px;
+  border: 1px solid var(--color-brand-border);
+  background-color: var(--color-black);
+  color: var(--color-white);
+  transition: background-color 150ms ease, color 150ms ease, border-color 150ms ease;
+}
+.social-btn:hover { border-color: var(--color-white); }
+.social-ig { background-color: #ef6c63; color: #ffffff; }
+.social-ig:hover { filter: brightness(1.05); }
+.social-x { background-color: #0a0a0a; color: #ffffff; }
+.social-x:hover { background-color: #111111; }
+
 /* Admin header title link override (win against global `a` color) */
 h1.admin-title a,
 h1.admin-title a:visited,
