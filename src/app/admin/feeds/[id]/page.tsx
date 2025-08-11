@@ -5,8 +5,9 @@ import Link from "next/link";
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
-export default async function EditFeedPage({ params }: { params: { id: string } }) {
-  const id = Number(params.id);
+export default async function EditFeedPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id: idParam } = await params;
+  const id = Number(idParam);
   const db = sql;
   if (!db) {
     return (
