@@ -51,13 +51,13 @@ export default function RootLayout({
         <footer className="bg-brand-header">
           <div className="mx-auto max-w-6xl px-4 py-10">
             <div className="align-with-nav">
-              <div className="flex items-center">
+              <div className="footer-brand">
                 <Link href="https://www.swacdc.org" className="font-logo text-white text-xl select-none">SWAC DC</Link>
               </div>
 
-              <div className="mt-6 flex items-center justify-between">
+              <div className="mt-6 footer-row">
                 <nav className="site-nav">
-                  <ul className="flex flex-wrap items-center gap-8 text-sm">
+                  <ul className="footer-nav text-sm">
                     <li><Link href="https://www.swacdc.org">Home</Link></li>
                     <li><a href="https://www.swacdc.org/history">About</a></li>
                     <li><a href="https://www.swacdc.org/s/stories">Stories</a></li>
@@ -65,7 +65,7 @@ export default function RootLayout({
                     <li><a href="https://www.swacdc.org/gallery">Gallery</a></li>
                   </ul>
                 </nav>
-                <div className="flex items-center gap-4">
+                <div className="footer-socials">
                   <a
                     href="https://www.instagram.com/swac_dc"
                     className="social-btn social-ig"
