@@ -98,6 +98,15 @@ footer .site-nav a:hover {
   text-underline-offset: 4px;
 }
 
+/* Admin header title link override (win against global `a` color) */
+h1.admin-title a,
+h1.admin-title a:visited,
+h1.admin-title a:active { color: var(--color-white) !important; }
+h1.admin-title a:hover {
+  color: var(--color-white) !important;
+  text-decoration: underline;
+}
+
 /* Custom responsive helpers (breakpoint: 960px) */
 .show-above-800 { display: none; }
 .hide-above-800 { display: inline-flex; }

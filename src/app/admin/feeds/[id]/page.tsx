@@ -1,4 +1,5 @@
 import { sql } from "@/lib/db";
+import { auth } from "@/auth";
 import { deleteFeedAction, updateFeedAction } from "../actions";
 import Link from "next/link";
 
@@ -6,6 +7,15 @@ export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 export default async function EditFeedPage({ params }: { params: Promise<{ id: string }> }) {
+  const session = await auth();
+  if (!session?.user) {
+    return (
+      <section className="mx-auto max-w-md px-4 py-12">
+        <h1 className="font-logo mb-6 text-2xl">Admin Login</h1>
+        <p className="text-brand-muted">You must be signed in to edit feeds.</p>
+      </section>
+    );
+  }
   const { id: idParam } = await params;
   const id = Number(idParam);
   const db = sql;

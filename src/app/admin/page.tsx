@@ -1,20 +1,42 @@
 // src/app/admin/page.tsx
-import { cookies } from "next/headers";
-import { loginAction, logoutAction } from "./actions";
+import { auth, signIn, signOut } from "@/auth";
+import { AuthError } from "next-auth";
+import { redirect } from "next/navigation";
 import Link from "next/link";
 import { sql } from "@/lib/db";
 
 export const dynamic = "force-dynamic"; // ensure SSR each visit
 
-export default async function AdminPage() {
-  const jar = await cookies();
-  const authed = jar.get("admin_session")?.value === "1";
+export default async function AdminPage({ searchParams }: { searchParams: Promise<Record<string, string | string[] | undefined>> }) {
+  const sp = await searchParams;
+  const error = typeof sp?.error === "string" ? sp.error : undefined;
+  const session = await auth();
+  const authed = Boolean(session?.user);
 
   if (!authed) {
     return (
       <section className="mx-auto max-w-md px-4 py-12">
         <h1 className="font-logo mb-6 text-2xl">Admin Login</h1>
-        <form action={loginAction} className="space-y-4">
+        {error && (
+          <div className="mb-4 rounded-md border border-red-500/40 bg-red-500/10 px-3 py-2 text-sm text-red-400">
+            Invalid Username or Password
+          </div>
+        )}
+        <form action={async (fd: FormData) => {
+          "use server";
+          try {
+            await signIn("credentials", {
+              username: String(fd.get("username") ?? "").trim(),
+              password: String(fd.get("password") ?? ""),
+              redirectTo: "/admin",
+            });
+          } catch (err) {
+            if (err instanceof AuthError) {
+              redirect("/admin?error=CredentialsSignin");
+            }
+            throw err;
+          }
+        }} className="space-y-4">
           <div>
             <label className="block text-sm text-brand-muted mb-1" htmlFor="username">Username</label>
             <input id="username" name="username" required className="w-full rounded-md border border-brand-border bg-brand-card px-3 py-2 text-brand-text outline-none focus:ring-2 focus:ring-red-500" />
@@ -48,10 +70,14 @@ export default async function AdminPage() {
   return (
     <section className="mx-auto max-w-6xl px-4 py-12 align-with-nav">
       <div className="mb-6 flex items-center justify-between">
-        <h1 className="font-logo text-2xl">Admin</h1>
+        <h1 className="font-logo text-2xl admin-title">
+          <Link href="/admin/profile" className="text-white hover:underline">
+            {(session?.user as any)?.username ?? session?.user?.name ?? "Admin"}
+          </Link>
+        </h1>
         <div className="flex items-center gap-3">
           <Link href="/admin/feeds/new" className="btn">New Feed</Link>
-          <form action={logoutAction}>
+          <form action={async () => { "use server"; await signOut({ redirectTo: "/admin" }); }}>
             <button type="submit" className="btn">Log out</button>
           </form>
         </div>
