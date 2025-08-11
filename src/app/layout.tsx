@@ -41,12 +41,12 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${montserrat.variable} ${geistSans.variable} ${geistMono.variable} ${logoFont.variable} bg-brand-bg text-brand-text`}>
+      <body className={`${montserrat.variable} ${geistSans.variable} ${geistMono.variable} ${logoFont.variable} bg-brand-bg text-brand-text min-h-dvh flex flex-col`}>
   <Header />
 
-        <main className="min-h-[calc(100dvh-140px)]">{children}</main>
+        <main className="flex-1">{children}</main>
 
-        <footer className="mt-16 bg-brand-header">
+        <footer className="bg-brand-header">
           <div className="mx-auto max-w-6xl px-4 py-10">
             <div className="align-with-nav">
               <div className="flex items-center">

@@ -2,7 +2,7 @@ const Parser = require('rss-parser');
 const parser = new Parser();
 
 (async () => {
-  const feed = await parser.parseURL('https://www.washingtonblade.com/feed/');
+  const feed = await parser.parseURL('https://rss.nytimes.com/services/xml/rss/nyt/US.xml');
   feed.items.forEach((item, idx) => {
     console.log(`\n--- Item ${idx + 1} ---`);
     console.log(item);
