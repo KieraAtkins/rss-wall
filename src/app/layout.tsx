@@ -5,6 +5,7 @@ import Header from "@/components/Header";
 import { Geist, Geist_Mono, Montserrat } from "next/font/google";
 import "./globals.css";
 import { Analytics } from "@vercel/analytics/next"
+import { SpeedInsights } from "@vercel/speed-insights/next"
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -99,6 +100,7 @@ export default function RootLayout({
           </div>
         </footer>
          <Analytics />
+         <SpeedInsights />
       </body>
     </html>
   );
