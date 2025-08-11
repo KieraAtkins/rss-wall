@@ -55,6 +55,23 @@ html, body {
 .hover\:text-brand-accent:hover { color: var(--color-brand-accent); }
 .hover\:bg-brand-accent:hover { background-color: var(--color-brand-accent); }
 
+/* Button utility matching "Log out" style */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem; /* ~gap-1.5 */
+  border-radius: 0.375rem; /* rounded-md */
+  border: 1px solid var(--color-brand-border);
+  background-color: var(--color-brand-card);
+  color: var(--color-brand-text);
+  padding: 0.375rem 0.75rem; /* px-3 py-1.5 */
+  transition: color 150ms ease, background-color 150ms ease, border-color 150ms ease;
+}
+.btn:hover {
+  background-color: var(--color-brand-accent);
+  color: var(--color-white);
+}
+
 /* Basic link styles */
 a { color: var(--color-brand-link); text-decoration: none; }
 a:hover { text-decoration: underline; }

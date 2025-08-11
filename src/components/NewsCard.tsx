@@ -17,7 +17,11 @@ export default function NewsCard({ title, link, pubDate, contentSnippet, source,
         // eslint-disable-next-line @next/next/no-img-element
       <img src={image} alt="" className="h-44 w-full object-cover" />
       ) : (
-      <div className="h-44 w-full bg-brand-header" />
+      <div className="h-44 w-full bg-brand-header flex items-center justify-center">
+        {/* decorative placeholder image */}
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src="/no-image.svg" alt="" aria-hidden="true" className="h-20 w-auto opacity-60" />
+      </div>
       )}
       <div className="p-4 flex flex-col gap-2">
   <a href={link}

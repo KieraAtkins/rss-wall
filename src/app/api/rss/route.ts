@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 export const runtime = "nodejs"; // ensure Node.js runtime for rss-parser
 export const dynamic = "force-dynamic"; // no static caching
 import Parser from "rss-parser";
-import { feeds, FeedConfig } from "@/feeds";
+import { sql } from "@/lib/db";
 
 const parser = new Parser();
 
@@ -22,6 +22,36 @@ type ParsedItem = {
 
 type NewsItem = ParsedItem & { source: string };
 
+type DBFeedRow = {
+  id: number;
+  name: string;
+  url: string;
+  item_limit: number | null;
+  keywords: string | null;
+};
+
+type FeedConfig = {
+  name: string;
+  url: string;
+  limit?: number;
+  keywords?: string;
+};
+
+async function getFeedsFromDB(): Promise<FeedConfig[]> {
+  if (!sql) throw new Error("DATABASE_URL not configured");
+  const rows = await sql<DBFeedRow[]>`
+    SELECT id, name, url, item_limit, keywords
+    FROM feeds
+    ORDER BY id ASC
+  `;
+  return rows.map((r: DBFeedRow) => ({
+    name: r.name,
+    url: r.url,
+    limit: r.item_limit ?? undefined,
+    keywords: r.keywords ?? undefined,
+  }));
+}
+
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
 
@@ -30,7 +60,15 @@ export async function GET(req: NextRequest) {
 
   const allItems: NewsItem[] = [];
 
-  for (const feed of feeds as FeedConfig[]) {
+  const feedList = await getFeedsFromDB();
+  // Debug: log feed names and urls retrieved from DB before processing
+  try {
+    console.log(
+      "RSS feeds loaded:",
+      feedList.map((f) => ({ name: f.name, url: f.url }))
+    );
+  } catch {}
+  for (const feed of feedList) {
   if (source && feed.name !== source) continue;
   try {
     const parsed = await parser.parseURL(feed.url);

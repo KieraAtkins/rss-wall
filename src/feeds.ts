@@ -11,6 +11,7 @@ export type FeedConfig = {
   keywords?: string;
 };
 
+/*
 export const feeds: FeedConfig[] = [
   
    {
@@ -45,3 +46,4 @@ export const feeds: FeedConfig[] = [
   },
   // Add more RSS feeds here!
 ];
+*/
