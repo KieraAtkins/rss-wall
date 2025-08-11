@@ -4,6 +4,7 @@ import { Bungee } from "next/font/google";
 import Header from "@/components/Header";
 import { Geist, Geist_Mono, Montserrat } from "next/font/google";
 import "./globals.css";
+import { Analytics } from "@vercel/analytics/next"
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -45,7 +46,7 @@ export default function RootLayout({
   <Header />
 
         <main className="flex-1">{children}</main>
-
+       
         <footer className="bg-brand-header">
           <div className="mx-auto max-w-6xl px-4 py-10">
             <div className="align-with-nav">
@@ -97,6 +98,7 @@ export default function RootLayout({
             </div>
           </div>
         </footer>
+         <Analytics />
       </body>
     </html>
   );
