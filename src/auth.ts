@@ -9,7 +9,8 @@ export const {
   signIn,
   signOut,
 } = NextAuth({
-  secret: process.env.NEXTAUTH_SECRET,
+  // Accept both Auth.js v5 (AUTH_SECRET) and legacy (NEXTAUTH_SECRET) names
+  secret: process.env.AUTH_SECRET ?? process.env.NEXTAUTH_SECRET,
   trustHost: true,
   session: { strategy: "jwt" },
   callbacks: {
