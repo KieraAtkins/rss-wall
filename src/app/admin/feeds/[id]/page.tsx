@@ -7,7 +7,17 @@ export const dynamic = "force-dynamic";
 
 export default async function EditFeedPage({ params }: { params: { id: string } }) {
   const id = Number(params.id);
-  const rows = await sql<{ id: number; name: string; url: string; item_limit: number | null; keywords: string | null }[]>`
+  const db = sql;
+  if (!db) {
+    return (
+      <section className="mx-auto max-w-2xl px-4 py-12 align-with-nav">
+        <h1 className="font-logo text-2xl mb-2">Edit Feed</h1>
+        <p className="text-brand-muted">Database is not configured. Please set DATABASE_URL.</p>
+      </section>
+    );
+  }
+
+  const rows = await db<{ id: number; name: string; url: string; item_limit: number | null; keywords: string | null }[]>`
     SELECT id, name, url, item_limit, keywords
     FROM feeds
     WHERE id = ${id}

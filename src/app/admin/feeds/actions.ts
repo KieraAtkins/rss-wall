@@ -18,7 +18,11 @@ export async function createFeedAction(formData: FormData) {
   if (limit === null || Number.isNaN(limit) || limit <= 0) {
     redirect("/admin?error=item_limit");
   }
-  await sql`
+  const db = sql;
+  if (!db) {
+    redirect("/admin?error=db");
+  }
+  await db`
     INSERT INTO feeds (name, url, item_limit, keywords)
     VALUES (${name}, ${url}, ${limit}, ${keywords})
   `;
@@ -39,7 +43,11 @@ export async function updateFeedAction(id: number, formData: FormData) {
   if (limit === null || Number.isNaN(limit) || limit <= 0) {
     redirect("/admin?error=item_limit");
   }
-  await sql`
+  const db = sql;
+  if (!db) {
+    redirect("/admin?error=db");
+  }
+  await db`
     UPDATE feeds
     SET name = ${name}, url = ${url}, item_limit = ${limit}, keywords = ${keywords}
     WHERE id = ${id}
@@ -49,7 +57,11 @@ export async function updateFeedAction(id: number, formData: FormData) {
 }
 
 export async function deleteFeedAction(id: number) {
-  await sql`DELETE FROM feeds WHERE id = ${id}`;
+  const db = sql;
+  if (!db) {
+    redirect("/admin?error=db");
+  }
+  await db`DELETE FROM feeds WHERE id = ${id}`;
   revalidatePath("/admin");
   redirect("/admin");
 }

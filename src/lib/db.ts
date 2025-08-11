@@ -1,7 +1,6 @@
 import postgres from "postgres";
 
 declare global {
-	// eslint-disable-next-line no-var
 	var __sql__: ReturnType<typeof postgres> | undefined;
 }
 
@@ -11,13 +10,13 @@ if (!DATABASE_URL) {
 	console.warn("DATABASE_URL is not set; database features will be disabled.");
 }
 
-export const sql =
+export const sql: ReturnType<typeof postgres> | undefined =
 	global.__sql__ ||
 	(DATABASE_URL
 		? postgres(DATABASE_URL, {
 				ssl: "require",
 			})
-		: (undefined as any));
+		: undefined);
 
 if (process.env.NODE_ENV !== "production") {
 	global.__sql__ = sql;

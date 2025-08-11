@@ -29,6 +29,16 @@ export default async function AdminPage() {
     );
   }
 
+  // Ensure database is configured
+  if (!sql) {
+    return (
+      <section className="mx-auto max-w-2xl px-4 py-12 align-with-nav">
+        <h1 className="font-logo text-2xl mb-2">Admin</h1>
+        <p className="text-brand-muted">Database is not configured. Please set DATABASE_URL to manage feeds.</p>
+      </section>
+    );
+  }
+
   const feeds = await sql<{ id: number; name: string; url: string; item_limit: number | null; keywords: string | null }[]>`
     SELECT id, name, url, item_limit, keywords
     FROM feeds
