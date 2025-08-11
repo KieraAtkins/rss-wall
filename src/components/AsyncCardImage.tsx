@@ -41,7 +41,7 @@ export default function AsyncCardImage({ link, initialSrc, alt = "" }: AsyncCard
 
   return src ? (
     // eslint-disable-next-line @next/next/no-img-element
-    <img src={src} alt={alt} className="h-44 w-full object-cover" />
+    <img src={src} alt={alt} className="h-44 w-full object-cover" loading="lazy" decoding="async" />
   ) : (
     <div className="h-44 w-full bg-brand-header flex items-center justify-center">
       {/* eslint-disable-next-line @next/next/no-img-element */}

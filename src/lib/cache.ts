@@ -43,3 +43,4 @@ export class LruCache<K, V> {
 
 // Singleton caches for common uses
 export const imageCache = new LruCache<string, { url: string; kind?: string }>(600);
+export const rssCache = new LruCache<string, unknown>(60);

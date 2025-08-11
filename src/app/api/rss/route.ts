@@ -4,7 +4,7 @@ export const dynamic = "force-dynamic"; // no static caching
 import Parser from "rss-parser";
 import { sql } from "@/lib/db";
 import { extractImageFromUrl } from "@/lib/extractImage";
-import { imageCache } from "@/lib/cache";
+import { imageCache, rssCache } from "@/lib/cache";
 
 const parser = new Parser();
 
@@ -65,6 +65,17 @@ export async function GET(req: NextRequest) {
   const ogBudgetParam = searchParams.get("ogBudget");
 
   const allItems: NewsItem[] = [];
+  // simple cache key: full query string
+  const noCache = searchParams.get("noCache") === "1";
+  const cacheKey = req.url;
+  if (!noCache) {
+    const cached = rssCache.get(cacheKey) as NewsItem[] | undefined;
+    if (cached) {
+      return new NextResponse(JSON.stringify(cached), {
+        headers: { "content-type": "application/json", "cache-control": "public, max-age=60, s-maxage=60" },
+      });
+    }
+  }
 
   const feedList = await getFeedsFromDB();
   // Debug: log feed names and urls retrieved from DB before processing
@@ -191,9 +202,16 @@ export async function GET(req: NextRequest) {
   if (limit) {
     const n = Number.parseInt(limit, 10);
     if (!Number.isNaN(n)) {
-      return NextResponse.json(allItems.slice(0, n));
+      const sliced = allItems.slice(0, n);
+      if (!noCache) rssCache.set(cacheKey, sliced, 1000 * 60);
+      return new NextResponse(JSON.stringify(sliced), {
+        headers: { "content-type": "application/json", "cache-control": "public, max-age=60, s-maxage=60" },
+      });
     }
   }
 
-  return NextResponse.json(allItems);
+  if (!noCache) rssCache.set(cacheKey, allItems, 1000 * 60);
+  return new NextResponse(JSON.stringify(allItems), {
+    headers: { "content-type": "application/json", "cache-control": "public, max-age=60, s-maxage=60" },
+  });
 }
