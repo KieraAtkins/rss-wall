@@ -1,10 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 export const runtime = "nodejs"; // ensure Node.js runtime for rss-parser
-export const dynamic = "force-dynamic"; // no static caching
+export const dynamic = "force-static"; // allow Next.js data cache
+export const revalidate = 300; // 5 minutes incremental revalidation
 import Parser from "rss-parser";
 import { sql } from "@/lib/db";
 import { extractImageFromUrl } from "@/lib/extractImage";
 import { imageCache, rssCache } from "@/lib/cache";
+import { hasKV, kvGetJSON, kvSetJSON, cacheKeyFromRequest } from "@/lib/persistentCache";
 import { ServerTimer } from "@/lib/serverTiming";
 
 const parser = new Parser();
@@ -71,11 +73,26 @@ export async function GET(req: NextRequest) {
   // simple cache key: full query string
   const noCache = searchParams.get("noCache") === "1";
   const cacheKey = req.url;
+  const kvKey = cacheKeyFromRequest(req);
+  if (!noCache && hasKV()) {
+    const kvCached = await kvGetJSON<NewsItem[]>(kvKey);
+    if (kvCached) {
+      const hdr = timer.toHeader();
+      endTotal("kv");
+      return new NextResponse(JSON.stringify(kvCached), {
+        headers: {
+          "content-type": "application/json",
+          "cache-control": "public, max-age=60, s-maxage=300, stale-while-revalidate=300",
+          ...(hdr ? { "server-timing": hdr } : {}),
+        },
+      });
+    }
+  }
   if (!noCache) {
     const cached = rssCache.get(cacheKey) as NewsItem[] | undefined;
     if (cached) {
       return new NextResponse(JSON.stringify(cached), {
-        headers: { "content-type": "application/json", "cache-control": "public, max-age=60, s-maxage=60" },
+        headers: { "content-type": "application/json", "cache-control": "public, max-age=60, s-maxage=300, stale-while-revalidate=300" },
       });
     }
   }
@@ -222,22 +239,29 @@ export async function GET(req: NextRequest) {
     const n = Number.parseInt(limit, 10);
     if (!Number.isNaN(n)) {
       const sliced = allItems.slice(0, n);
-      if (!noCache) rssCache.set(cacheKey, sliced, 1000 * 60);
+  if (!noCache) rssCache.set(cacheKey, sliced, 1000 * 60 * 5);
       const hdr = timer.toHeader();
       endTotal();
+      if (!noCache && hasKV()) {
+        // store 5 min in KV
+        await kvSetJSON(kvKey, sliced, 300);
+      }
       return new NextResponse(JSON.stringify(sliced), {
-        headers: { "content-type": "application/json", "cache-control": "public, max-age=60, s-maxage=60" },
+    headers: { "content-type": "application/json", "cache-control": "public, max-age=60, s-maxage=300, stale-while-revalidate=300" },
       });
     }
   }
 
-  if (!noCache) rssCache.set(cacheKey, allItems, 1000 * 60);
+  if (!noCache) rssCache.set(cacheKey, allItems, 1000 * 60 * 5);
   const hdr = timer.toHeader();
   endTotal();
+  if (!noCache && hasKV()) {
+    await kvSetJSON(kvKey, allItems, 300);
+  }
   return new NextResponse(JSON.stringify(allItems), {
     headers: {
       "content-type": "application/json",
-      "cache-control": "public, max-age=60, s-maxage=60",
+  "cache-control": "public, max-age=60, s-maxage=300, stale-while-revalidate=300",
       ...(hdr ? { "server-timing": hdr } : {}),
     },
   });
