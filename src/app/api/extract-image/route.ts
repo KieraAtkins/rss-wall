@@ -48,3 +48,4 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: "Failed to fetch or parse target" }, { status: 502 });
   }
 }
+

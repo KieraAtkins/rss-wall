@@ -69,6 +69,7 @@ export async function GET(req: NextRequest) {
       variants.push(u.toString());
     }
   }
+  
 
   const endFetch = timer.start("fetches");
   const res = await Promise.allSettled(
