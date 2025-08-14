@@ -5,6 +5,7 @@ import Parser from "rss-parser";
 import { sql } from "@/lib/db";
 import { extractImageFromUrl } from "@/lib/extractImage";
 import { imageCache, rssCache } from "@/lib/cache";
+import { ServerTimer } from "@/lib/serverTiming";
 
 const parser = new Parser();
 
@@ -57,6 +58,8 @@ async function getFeedsFromDB(): Promise<FeedConfig[]> {
 }
 
 export async function GET(req: NextRequest) {
+  const timer = new ServerTimer();
+  const endTotal = timer.start("total");
   const { searchParams } = new URL(req.url);
 
   const source = searchParams.get("source"); // e.g., "Truthout"
@@ -77,7 +80,9 @@ export async function GET(req: NextRequest) {
     }
   }
 
+  const endDb = timer.start("db");
   const feedList = await getFeedsFromDB();
+  endDb("feeds");
   // Debug: log feed names and urls retrieved from DB before processing
   try {
     console.log(
@@ -140,58 +145,72 @@ export async function GET(req: NextRequest) {
     if (!Number.isNaN(n) && n >= 0) ogBudget = n;
   }
 
-  for (const feed of feedList) {
-  if (source && feed.name !== source) continue;
-  try {
-    const parsed = await parser.parseURL(feed.url);
-      let items: NewsItem[] = (parsed.items as ParsedItem[]).map((item) => {
-        const image = extractImage(item);
-        return { ...(item as ParsedItem), source: feed.name, image } as NewsItem;
-      });
-      // Per-feed keyword filtering (semicolon-separated, case-insensitive)
-      if (feed.keywords && feed.keywords.trim().length > 0) {
-        const terms = feed.keywords
-          .split(";")
-          .map((t) => t.trim())
-          .filter(Boolean)
-          .map((t) => t.toLowerCase());
-        if (terms.length > 0) {
-          items = items.filter((it) => {
-            const hay = `${it.title ?? ""} ${it.contentSnippet ?? ""}`.toLowerCase();
-            return terms.some((term) => hay.includes(term));
-          });
+  const feedsToLoad = feedList.filter((f) => !source || f.name === source);
+  const results = await Promise.allSettled(
+    feedsToLoad.map(async (feed) => {
+      try {
+        const endParse = timer.start("parse");
+        const parsed = await parser.parseURL(feed.url);
+        endParse(feed.name);
+        let items: NewsItem[] = (parsed.items as ParsedItem[]).map((item) => {
+          const image = extractImage(item);
+          return { ...(item as ParsedItem), source: feed.name, image } as NewsItem;
+        });
+        // Per-feed keyword filtering (semicolon-separated, case-insensitive)
+        if (feed.keywords && feed.keywords.trim().length > 0) {
+          const terms = feed.keywords
+            .split(";")
+            .map((t) => t.trim())
+            .filter(Boolean)
+            .map((t) => t.toLowerCase());
+          if (terms.length > 0) {
+            items = items.filter((it) => {
+              const hay = `${it.title ?? ""} ${it.contentSnippet ?? ""}`.toLowerCase();
+              return terms.some((term) => hay.includes(term));
+            });
+          }
         }
-      }
-    if (feed.limit) {
-      items = items.slice(0, feed.limit);
-    }
-    // Optional heavier fallback: fetch article page for og:image when missing
-    if (useOg && ogBudget > 0) {
-      for (const it of items) {
-        if (ogBudget <= 0) break;
-        if (!it.image && it.link) {
-          try {
-            const cached = imageCache.get(it.link);
-            if (cached?.url) {
-              it.image = cached.url;
-              ogBudget--;
-            } else {
-              const result = await extractImageFromUrl(it.link, 6000);
-              if (result.url) {
-                it.image = result.url;
-                imageCache.set(it.link, { url: result.url, kind: result.kind }, 1000 * 60 * 30);
-                ogBudget--;
-              }
-            }
-          } catch {}
+        if (feed.limit) {
+          items = items.slice(0, feed.limit);
         }
+        return items;
+      } catch (err) {
+        console.error(`Failed to parse feed: ${feed.url}`, err);
+        return [] as NewsItem[];
       }
+    })
+  );
+
+  for (const r of results) {
+    if (r.status === "fulfilled" && Array.isArray(r.value)) {
+      allItems.push(...r.value);
     }
-    allItems.push(...items);
-  } catch (err) {
-    console.error(`Failed to parse feed: ${feed.url}`, err);
   }
-}
+
+  // Optional heavier fallback: fetch article page for og:image when missing (sequential budget)
+  if (useOg && ogBudget > 0) {
+    const endOg = timer.start("og");
+    for (const it of allItems) {
+      if (ogBudget <= 0) break;
+      if (!it.image && it.link) {
+        try {
+          const cached = imageCache.get(it.link);
+          if (cached?.url) {
+            it.image = cached.url;
+            ogBudget--;
+          } else {
+            const result = await extractImageFromUrl(it.link, 6000);
+            if (result.url) {
+              it.image = result.url;
+              imageCache.set(it.link, { url: result.url, kind: result.kind }, 1000 * 60 * 30);
+              ogBudget--;
+            }
+          }
+        } catch {}
+      }
+    }
+    endOg(`${allItems.length} items`);
+  }
 
   const toTime = (i: NewsItem) => {
     const raw = (i.pubDate ?? i.isoDate) as string | undefined;
@@ -204,6 +223,8 @@ export async function GET(req: NextRequest) {
     if (!Number.isNaN(n)) {
       const sliced = allItems.slice(0, n);
       if (!noCache) rssCache.set(cacheKey, sliced, 1000 * 60);
+      const hdr = timer.toHeader();
+      endTotal();
       return new NextResponse(JSON.stringify(sliced), {
         headers: { "content-type": "application/json", "cache-control": "public, max-age=60, s-maxage=60" },
       });
@@ -211,7 +232,13 @@ export async function GET(req: NextRequest) {
   }
 
   if (!noCache) rssCache.set(cacheKey, allItems, 1000 * 60);
+  const hdr = timer.toHeader();
+  endTotal();
   return new NextResponse(JSON.stringify(allItems), {
-    headers: { "content-type": "application/json", "cache-control": "public, max-age=60, s-maxage=60" },
+    headers: {
+      "content-type": "application/json",
+      "cache-control": "public, max-age=60, s-maxage=60",
+      ...(hdr ? { "server-timing": hdr } : {}),
+    },
   });
 }

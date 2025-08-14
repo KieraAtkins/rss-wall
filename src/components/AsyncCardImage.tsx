@@ -1,5 +1,6 @@
 "use client";
 import React from "react";
+import Image from "next/image";
 
 type AsyncCardImageProps = {
   link: string;
@@ -39,13 +40,24 @@ export default function AsyncCardImage({ link, initialSrc, alt = "" }: AsyncCard
     };
   }, [link, initialSrc]);
 
-  return src ? (
-    // eslint-disable-next-line @next/next/no-img-element
-    <img src={src} alt={alt} className="h-44 w-full object-cover" loading="lazy" decoding="async" />
-  ) : (
-    <div className="h-44 w-full bg-brand-header flex items-center justify-center">
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img src="/no-image.svg" alt="" aria-hidden="true" className="h-20 w-auto opacity-60" />
+  return (
+    <div className="h-44 w-full relative overflow-hidden bg-brand-header">
+      {src ? (
+        <Image
+          src={src}
+          alt={alt}
+          fill
+          unoptimized
+          loading="lazy"
+          sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
+          style={{ objectFit: "cover" }}
+        />
+      ) : (
+        <div className="absolute inset-0 flex items-center justify-center">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/no-image.svg" alt="" aria-hidden="true" className="h-20 w-auto opacity-60" />
+        </div>
+      )}
     </div>
   );
 }

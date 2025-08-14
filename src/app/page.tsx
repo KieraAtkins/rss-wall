@@ -1,55 +1,18 @@
 // src/app/page.tsx
-import NewsCard from "@/components/NewsCard";
-import { headers } from "next/headers";
+import { Suspense } from "react";
+import GridSkeleton from "@/components/GridSkeleton";
+import NewsList from "./NewsList";
 
-type NewsItem = {
-  title: string;
-  link: string;
-  pubDate: string;
-  contentSnippet?: string;
-  source: string;
-  image?: string;
-  enclosure?: { url?: string };
-  media?: { content?: { url?: string } };
-};
-
-async function getNews() {
-  try {
-    const h = await headers();
-    const proto = h.get("x-forwarded-proto") ?? "http";
-    const host = h.get("host") ?? "localhost:3000";
-    const baseUrl = `${proto}://${host}`;
-  const res = await fetch(`${baseUrl}/api/rss`, { cache: "no-store" });
-    if (!res.ok) throw new Error(`Failed to load RSS: ${res.status}`);
-    return res.json();
-  } catch (err) {
-    console.error("Failed to fetch /api/rss", err);
-    return [] as NewsItem[];
-  }
-}
-
-export default async function Home() {
-  const news: NewsItem[] = await getNews();
-
+export default function Home() {
   return (
-  <section className="mx-auto max-w-6xl px-4 py-8">
-    <div className="align-with-nav">
-      <h1 className="font-logo mb-6 text-3xl font-semibold tracking-wide">Latest News</h1>
-      <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-        {news.map((item, idx) => (
-          <div key={idx} className="card-fade-in" style={{ animationDelay: `${Math.min(idx * 90, 700)}ms` }}>
-            <NewsCard
-              title={item.title}
-              link={item.link}
-              pubDate={item.pubDate}
-              contentSnippet={item.contentSnippet || ""}
-              source={item.source}
-              image={item.image || item.enclosure?.url || item.media?.content?.url}
-            />
-          </div>
-        ))}
+    <section className="mx-auto max-w-6xl px-4 py-8">
+      <div className="align-with-nav">
+        <h1 className="font-logo mb-6 text-3xl font-semibold tracking-wide">Latest News</h1>
+        <Suspense fallback={<GridSkeleton count={9} />}>
+          {/* Stream the news list separately so the shell paints immediately */}
+          <NewsList />
+        </Suspense>
       </div>
-    </div>
-  </section>
+    </section>
   );
 }

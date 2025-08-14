@@ -1,0 +1,19 @@
+export default function GridSkeleton({ count = 9 }: { count?: number }) {
+  const items = Array.from({ length: count });
+  return (
+    <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+      {items.map((_, i) => (
+        <div key={i} className="overflow-hidden rounded-brand border border-brand-border bg-brand-card shadow-brand">
+          <div className="h-44 w-full bg-brand-header skeleton-pulse" />
+          <div className="p-4 space-y-3">
+            <div className="h-4 w-3/4 rounded bg-brand-header skeleton-pulse" />
+            <div className="h-3 w-1/3 rounded bg-brand-header skeleton-pulse" />
+            <div className="h-3 w-full rounded bg-brand-header skeleton-pulse" />
+            <div className="h-3 w-5/6 rounded bg-brand-header skeleton-pulse" />
+            <div className="h-3 w-2/3 rounded bg-brand-header skeleton-pulse" />
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}

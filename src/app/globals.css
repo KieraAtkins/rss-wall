@@ -186,3 +186,11 @@ h1.admin-title a:hover {
   .align-with-nav { padding-left: var(--nav-offset); }
   .nav-offset { margin-left: var(--nav-offset); }
 }
+
+/* Skeleton pulse utility for loading placeholders */
+@keyframes skeletonPulse {
+  0% { opacity: 0.4; }
+  50% { opacity: 0.75; }
+  100% { opacity: 0.4; }
+}
+.skeleton-pulse { animation: skeletonPulse 1.2s ease-in-out infinite; }
