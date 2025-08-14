@@ -83,7 +83,7 @@ export async function GET(req: NextRequest) {
   );
   endFetch(`${variants.length} urls`);
   endTotal();
-
+ 
   const hdr = timer.toHeader();
   return new NextResponse(
     JSON.stringify({ count: variants.length, results: res, variants }),
