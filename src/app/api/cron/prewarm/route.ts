@@ -18,19 +18,31 @@ export async function GET(req: NextRequest) {
   // Basic auth: allow Vercel Cron header, or require CRON_SECRET header when set
   const vercelCron = req.headers.get("x-vercel-cron");
   const secret = process.env.CRON_SECRET;
-  const provided = req.headers.get("x-cron-secret") || new URL(req.url).searchParams.get("secret");
+  const url = new URL(req.url);
+  const provided =
+    req.headers.get("x-cron-secret") ||
+    url.searchParams.get("secret") ||
+    (() => {
+      const auth = req.headers.get("authorization");
+      if (!auth) return null;
+      const [scheme, token] = auth.split(" ");
+      if (scheme?.toLowerCase() === "bearer") return token || null;
+      return null;
+    })();
+
   if (secret) {
+    // If a secret is configured, accept any of: Authorization: Bearer <secret>, x-cron-secret header, or ?secret= query.
     if (provided !== secret) {
       return NextResponse.json({ error: "forbidden" }, { status: 403 });
     }
   } else if (!vercelCron) {
+    // Without a secret, only allow calls that originate from Vercel Cron (header automatically added).
     return NextResponse.json({ error: "forbidden" }, { status: 403 });
   }
 
   const timer = new ServerTimer();
   const endTotal = timer.start("total");
 
-  const url = new URL(req.url);
   const origin = url.origin;
   const sp = url.searchParams;
   const og = sp.get("og") ?? undefined; // default off; pass "1" to include
