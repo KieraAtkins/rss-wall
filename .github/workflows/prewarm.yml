@@ -1,0 +1,30 @@
+name: Prewarm RSS cache
+
+on:
+  schedule:
+    - cron: "*/10 * * * *" # every 10 minutes
+  workflow_dispatch: {}
+
+jobs:
+  call-prewarm:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Call prewarm endpoint
+        env:
+          PREWARM_URL: ${{ secrets.PREWARM_URL }}
+          CRON_SECRET: ${{ secrets.CRON_SECRET }}
+        run: |
+          if [ -z "$PREWARM_URL" ]; then
+            echo "PREWARM_URL secret is not set" >&2
+            exit 1
+          fi
+          # Add sources=1 for per-source warming if desired; keep OG off by default to keep it fast
+          URL="$PREWARM_URL""?sources=1"
+          echo "Hitting: $URL"
+          # Prefer Authorization: Bearer <secret>; fall back to query if no secret
+          if [ -n "$CRON_SECRET" ]; then
+            curl -sS -f -H "Authorization: Bearer $CRON_SECRET" "$URL" > /dev/null
+          else
+            curl -sS -f "$URL" > /dev/null
+          fi
+          echo "Prewarm complete"
