@@ -6,7 +6,7 @@ const nextConfig: NextConfig = {
     // If you want full optimization, add allowed domains or a remotePatterns list and remove `unoptimized`.
     remotePatterns: [
       { protocol: "https", hostname: "**" },
-      //{ protocol: "http", hostname: "**" },
+      { protocol: "http", hostname: "**" },
     ],
   },
 };
