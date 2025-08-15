@@ -34,7 +34,7 @@ export default function Header() {
           <nav className="site-nav show-above-800 nav-offset text-sm">
             <ul className="flex items-center gap-8">
               <li><Link href="https://www.swacdc.org">Home</Link></li>
-              <li><a href="https://www.swacdc.org/history">About</a></li>
+              <li><a href="https://www.swacdc.org/about">About</a></li>
               <li><a href="https://www.swacdc.org/s/stories">Stories</a></li>
               <li><Link href="/">News</Link></li>
               <li><a href="https://www.swacdc.org/gallery">Gallery</a></li>
@@ -74,7 +74,7 @@ export default function Header() {
               </a>
             </li>
             <li>
-              <a href="https://www.swacdc.org/history" className="block px-2 py-3 text-white" onClick={() => setOpen(false)}>
+              <a href="https://www.swacdc.org/about" className="block px-2 py-3 text-white" onClick={() => setOpen(false)}>
                 About
               </a>
             </li>

@@ -59,7 +59,7 @@ export default function RootLayout({
                 <nav className="site-nav">
                   <ul className="footer-nav text-sm">
                     <li><Link href="https://www.swacdc.org">Home</Link></li>
-                    <li><a href="https://www.swacdc.org/history">About</a></li>
+                    <li><a href="https://www.swacdc.org/about">About</a></li>
                     <li><a href="https://www.swacdc.org/s/stories">Stories</a></li>
                     <li><Link href="/">News</Link></li>
                     <li><a href="https://www.swacdc.org/gallery">Gallery</a></li>
