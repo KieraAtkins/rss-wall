@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 export const runtime = "nodejs"; // ensure Node.js runtime for rss-parser
-export const dynamic = "force-static"; // allow Next.js data cache
-export const revalidate = 300; // 5 minutes incremental revalidation
+export const dynamic = "force-dynamic"; // always execute on request; rely on our own caches
 import Parser from "rss-parser";
 import { sql } from "@/lib/db";
 import { extractImageFromUrl } from "@/lib/extractImage";
@@ -82,7 +81,7 @@ export async function GET(req: NextRequest) {
       return new NextResponse(JSON.stringify(kvCached), {
         headers: {
           "content-type": "application/json",
-          "cache-control": "public, max-age=60, s-maxage=300, stale-while-revalidate=300",
+          "cache-control": "no-store",
           ...(hdr ? { "server-timing": hdr } : {}),
         },
       });
@@ -92,7 +91,7 @@ export async function GET(req: NextRequest) {
     const cached = rssCache.get(cacheKey) as NewsItem[] | undefined;
     if (cached) {
       return new NextResponse(JSON.stringify(cached), {
-        headers: { "content-type": "application/json", "cache-control": "public, max-age=60, s-maxage=300, stale-while-revalidate=300" },
+        headers: { "content-type": "application/json", "cache-control": "no-store" },
       });
     }
   }
@@ -247,7 +246,7 @@ export async function GET(req: NextRequest) {
         await kvSetJSON(kvKey, sliced, 300);
       }
       return new NextResponse(JSON.stringify(sliced), {
-    headers: { "content-type": "application/json", "cache-control": "public, max-age=60, s-maxage=300, stale-while-revalidate=300" },
+        headers: { "content-type": "application/json", "cache-control": "no-store" },
       });
     }
   }
@@ -261,7 +260,7 @@ export async function GET(req: NextRequest) {
   return new NextResponse(JSON.stringify(allItems), {
     headers: {
       "content-type": "application/json",
-  "cache-control": "public, max-age=60, s-maxage=300, stale-while-revalidate=300",
+  "cache-control": "no-store",
       ...(hdr ? { "server-timing": hdr } : {}),
     },
   });
