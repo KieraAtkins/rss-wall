@@ -76,6 +76,27 @@ html, body {
 a { color: var(--color-brand-link); text-decoration: none; }
 a:hover { text-decoration: underline; }
 
+/* Never underline the brand logo links */
+a.font-logo,
+a.font-logo:hover,
+a.font-logo:focus,
+a.font-logo:focus-visible {
+  text-decoration: none !important;
+}
+/* Force logo link color to white across states and remove any ::after underline */
+a.font-logo,
+a.font-logo:visited,
+a.font-logo:hover,
+a.font-logo:active,
+header a.font-logo,
+footer a.font-logo {
+  color: var(--color-white) !important;
+}
+header a.font-logo::after,
+footer a.font-logo::after {
+  content: none !important;
+}
+
 /* Header nav overrides: white links with animated underline on hover */
 header .site-nav a {
   color: var(--color-white);

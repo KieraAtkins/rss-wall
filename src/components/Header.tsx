@@ -44,8 +44,8 @@ export default function Header() {
 
         {/* Center logo */}
         <div className="flex justify-center pointer-events-none">
-          <Link href="https://www.swacdc.org" className="inline-flex items-center gap-2 select-none pointer-events-auto">
-            <span className="font-logo text-lg tracking-[0.05em] text-white">SWAC DC</span>
+          <Link href="https://www.swacdc.org" className="inline-flex items-center gap-2 select-none pointer-events-auto font-logo text-white text-lg tracking-[0.05em]">
+            <span className="">SWAC DC</span>
           </Link>
         </div>
 
