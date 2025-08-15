@@ -76,26 +76,52 @@ html, body {
 a { color: var(--color-brand-link); text-decoration: none; }
 a:hover { text-decoration: underline; }
 
-/* Header nav overrides: white links, underline on hover (white, thicker, offset) */
-header .site-nav a { color: var(--color-white); text-decoration: none; }
-header .site-nav a:hover {
+/* Header nav overrides: white links with animated underline on hover */
+header .site-nav a {
   color: var(--color-white);
-  text-decoration-line: underline;
-  text-decoration-color: var(--color-white);
-  text-decoration-thickness: 2px;
-  text-underline-offset: 4px;
+  text-decoration: none;
+  position: relative;
+}
+header .site-nav a::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -4px; /* similar to underline offset */
+  height: 2px;
+  background-color: var(--color-white);
+  transform: scaleX(0);
+  transform-origin: left center;
+  transition: transform 180ms ease-out;
+}
+header .site-nav a:hover::after,
+header .site-nav a:focus-visible::after {
+  transform: scaleX(1);
 }
 
-/* Footer nav overrides: white links with white underline on hover */
+/* Footer nav overrides: matching animated underline */
 footer a { color: var(--color-white); }
 footer a:hover { color: var(--color-white); }
-footer .site-nav a { color: var(--color-white); text-decoration: none; }
-footer .site-nav a:hover {
+footer .site-nav a {
   color: var(--color-white);
-  text-decoration-line: underline;
-  text-decoration-color: var(--color-white);
-  text-decoration-thickness: 2px;
-  text-underline-offset: 4px;
+  text-decoration: none;
+  position: relative;
+}
+footer .site-nav a::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -4px;
+  height: 2px;
+  background-color: var(--color-white);
+  transform: scaleX(0);
+  transform-origin: left center;
+  transition: transform 180ms ease-out;
+}
+footer .site-nav a:hover::after,
+footer .site-nav a:focus-visible::after {
+  transform: scaleX(1);
 }
 
 /* Social buttons in footer */
