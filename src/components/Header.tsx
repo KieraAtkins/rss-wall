@@ -31,7 +31,7 @@ export default function Header() {
           </button>
 
           {/* Inline nav (≥800px) */}
-          <nav className="site-nav show-above-800 nav-offset text-sm">
+          <nav className="site-nav show-above-800 nav-offset text-sm relative z-10">
             <ul className="flex items-center gap-8">
               <li><Link href="https://www.swacdc.org">Home</Link></li>
               <li><a href="https://www.swacdc.org/about">About</a></li>
@@ -43,8 +43,8 @@ export default function Header() {
         </div>
 
         {/* Center logo */}
-        <div className="flex justify-center">
-          <Link href="https://www.swacdc.org" className="inline-flex items-center gap-2 select-none">
+        <div className="flex justify-center pointer-events-none">
+          <Link href="https://www.swacdc.org" className="inline-flex items-center gap-2 select-none pointer-events-auto">
             <span className="font-logo text-lg tracking-[0.05em] text-white">SWAC DC</span>
           </Link>
         </div>
